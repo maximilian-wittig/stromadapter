@@ -31,20 +31,20 @@
     .grid{ display:grid; gap:var(--space); }
 
     .preview-card{ background:#fff; border:1px solid var(--border); border-radius:18px; padding:16px; display:flex; gap:16px; }
-    .preview-visual{ flex:0 0 360px; max-width:100%; aspect-ratio:4/3; border:1px dashed var(--border); border-radius:14px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#fff,#fafafa); overflow:hidden; }
+    .preview-visual{ position:relative; flex:0 0 360px; max-width:100%; aspect-ratio:4/3; border:1px; border-radius:14px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ffffff,#fafafa); overflow:hidden; }
     .preview-visual img{ max-width:100%; max-height:100%; object-fit:contain; }
     .preview-info{ flex:1; display:flex; flex-direction:column; gap:8px; }
     .muted{ color:var(--muted); }
     .pill{ display:inline-flex; align-items:center; gap:8px; padding:8px 10px; background:#fff; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted); }
 
-    /* ----- Konfigurator Layout Politur ----- */
+    /* Konfigurator Layout */
     .cfg-block{ margin-top:var(--space-lg); }
     .cfg-label{ display:block; font-size:14px; font-weight:700; margin-bottom:10px; }
 
-    /* Eingangsseite: fließend, ohne "Löcher" – responsive Auto-Fit */
+    /* Eingangsseite: fließend – responsive Auto-Fit */
     #inputPicker{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
 
-    /* Ausgangsseite: wie gehabt (breite, längenangepasste Karten) */
+    /* Ausgangsseite: breite, längenangepasste Karten */
     #outputPicker{ display:grid; gap:12px; grid-auto-flow:row; grid-template-columns:repeat(auto-fit, minmax(260px, max-content)); justify-content:start; }
 
     .pick-card{ position:relative; border:1px solid var(--border); background:#fff; border-radius:14px; padding:12px; cursor:pointer; display:flex; gap:12px; align-items:center; transition: box-shadow .15s, border-color .15s; width:100%; }
@@ -56,7 +56,7 @@
     .small{ font-size:12px; color:var(--muted); }
     .pick-right{ margin-left:auto; display:flex; align-items:center; gap:6px; }
 
-    /* Anzahl-Ausgänge: Buttons nebeneinander, ohne Lückenumbruch */
+    /* Anzahl-Ausgänge */
     .count-row{ display:flex; gap:8px; }
     .count-row .button{ flex:1 0 0; }
 
@@ -66,9 +66,25 @@
 
     .error{ color:#b91c1c; font-weight:600; }
 
-    /* 2/3 : 1/3 Spaltensetup mit großzügigerem Abstand */
+    /* 2/3 : 1/3 Spaltensetup */
     .layout-outputs{ display:grid; grid-template-columns:2fr 1fr; gap:var(--space-lg); }
     @media (max-width:900px){ .layout-outputs{ grid-template-columns:1fr; } }
+
+    /* Galerie-Pfeile + Zähler (bleiben aktiv, auch wenn Hero-Bild statisch ist) */
+    .pv-nav{
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(17,24,39,.6); color:#fff; border:0;
+      width:34px; height:34px; border-radius:999px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .pv-nav:focus{ outline:none; box-shadow:0 0 0 3px var(--focus); }
+    .pv-prev{ left:8px; }
+    .pv-next{ right:8px; }
+    .pv-counter{
+      position:absolute; right:8px; bottom:8px;
+      background:rgba(255,255,255,.85); border:1px solid var(--border);
+      padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -81,11 +97,9 @@
       </div>
       <div>
         <button class="button" onclick="
-  const el=document.getElementById('konfigurator');
-  window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 30, behavior:'smooth'});
-">
-  Konfigurator
-</button>
+          const el=document.getElementById('konfigurator');
+          window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 30, behavior:'smooth'});
+        ">Konfigurator</button>
         <button class="button primary" onclick="document.getElementById('kontakt').scrollIntoView({behavior:'smooth'})">Anfrage</button>
       </div>
     </div>
@@ -93,46 +107,24 @@
 
   <section class="hero container">
     <div>
-      <h1>Konfiguriere deinen Adapter.<br>egal ob Strom, Signal oder Daten.</h1>
+      <h1>Konfiguriere deinen Adapter.<br></h1>
       <p class="sub">
-        Kategorie<b> Power</b> aktuell verfügbar. Sound-/Daten-Kategorien (SpeakON, XLR, EtherCON) sowie Schuko/IEC sind derzeit ausgeblendet.
-        Eingangsseite ist immer <b>1×</b>. Ausgangsseite: <b>1× oder 2×</b>. <br> 3D-Gedrucktes Gehäuse, Seetronic Stecker 100% kompatibel mit Neutrik PowerCon und PowerCon TR1.
-      </p>
+        Kategorie<b> Power</b> aktuell verfügbar.</p>
       <div style="display:flex; gap:10px; margin-top:16px;">
-        <button class="button primary" onclick="
-  const el=document.getElementById('konfigurator');
-  window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 30, behavior:'smooth'});
-">
-  Konfigurator öffnen
-</button>
-        <button class="button" onclick="document.getElementById('kontakt').scrollIntoView({behavior:'smooth'})">Anfrage</button>
+      
+       
       </div>
     </div>
-    <div class="panel">
-      <div class="preview-card">
-        <div class="preview-visual"><img id="heroPreview" alt="Adapter Vorschau"></div>
-        <div class="preview-info">
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <span class="pill">Robustes Gehäuse</span>
-            <span class="pill">Wartungsfreundlich</span>
-            <span class="pill">Individuell konfigurierbar</span>
-          </div>
-          <h3 style="margin:8px 0 0">Vorschau</h3>
-          <div class="io-strip">
-            <div class="io-item"><img id="heroInImg" alt="Eingang"><span class="small" id="heroInTxt">—</span></div>
-            <span class="small">→</span>
-            <div class="io-item" id="heroOutWrap"><img id="heroOutImg" alt="Ausgang"><span class="small" id="heroOutTxt">—</span></div>
-            <span class="small" id="heroOutCount">×1</span>
-          </div>
-          <p class="muted" style="margin:1">25€ pro Stück</p>
-        </div>
-      </div>
+
+    <!-- Dein statisches Startbild: bleibt so -->
+    <div class="preview-visual">
+      <img src="img/hero.png" alt="Adapter Vorschau">
     </div>
   </section>
 
   <section id="konfigurator" class="container" style="margin-top:24px;">
     <h2>Konfigurator</h2>
-    <p class="muted">Wähle den Eingang (immer 1×) und den Ausgang (1 oder 2×). Nur Power-Typen: <b>TR1</b> & <b>PowerCON</b>.</p>
+    <p class="muted">Wähle den Eingang (1×) und den Ausgang (1 oder 2×). Nur Power-Typen: <b>TR1</b> & <b>PowerCON</b>.</p>
 
     <!-- Eingangsseite -->
     <div class="panel cfg-block">
@@ -153,7 +145,6 @@
           <button class="button" id="btnOut2">2</button>
         </div>
         <div style="height:12px;"></div>
-
       </div>
     </div>
 
@@ -162,11 +153,17 @@
     <!-- Ergebnis -->
     <div id="result" class="panel cfg-block">
       <div class="preview-card">
-        <div class="preview-visual"><img id="resultPreview" alt="Konfigurierte Vorschau"></div>
+        <div class="preview-visual">
+          <button class="pv-nav pv-prev" type="button" onclick="prevImage()">‹</button>
+          <img id="resultPreview" alt="Konfigurierte Vorschau">
+          <button class="pv-nav pv-next" type="button" onclick="nextImage()">›</button>
+          <span class="pv-counter" id="resultCounter">1/1</span>
+        </div>
         <div class="preview-info">
-          <h3 id="sku">ADP-—</h3>
+		
+          <h3><span class="muted">Artikelcode:</span> <span id="sku">-</span></h3>
           <p id="desc" class="muted">—</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;" id="chips"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;" id="chips"></div>
           <div class="io-strip" style="margin-top:6px;">
             <div class="io-item"><img id="resInImg" alt="Eingang"><span class="small" id="resInTxt">—</span></div>
             <span class="small">→</span>
@@ -174,8 +171,7 @@
             <span class="small" id="resOutCount">×1</span>
           </div>
           <div style="margin-top:auto; display:flex; justify-content:flex-end;">
-            
-            <button class="button" onclick="downloadDatasheet()">Produktdatenblatt herunterladen</button>
+            <button class="button primary" onclick="downloadDatasheet()">Produktdatenblatt herunterladen</button>
           </div>
         </div>
       </div>
@@ -186,7 +182,7 @@
     <div class="grid" style="grid-template-columns:1fr 1fr; gap:var(--space-lg);">
       <div>
         <strong>Kontakt</strong>
-        <p class="muted">Schreibe uns deine Anforderungen oder lade eine Zeichnung/Skizze hoch. </p>
+        <p class="muted"></p>
       </div>
       <form class="panel" method="post" action="mailto:you@example.com?subject=Anfrage%20Stromadapter" enctype="text/plain">
         <label for="name">Name</label>
@@ -197,7 +193,7 @@
         <div style="height:8px"></div>
         <label for="msg">Nachricht</label>
         <textarea id="msg" name="Nachricht" rows="4" placeholder="Kurzbeschreibung deiner Anwendung" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:12px;"></textarea>
-        <div style="height:12px"></div>
+        <div style="height:12px;"></div>
         <button class="button primary" type="submit">Anfrage senden</button>
       </form>
     </div>
@@ -221,29 +217,56 @@
       { code:"sac3mpb", label:"PowerTwist female",     img:"img/sac3mpb.png"  },
     ];
 
-    const VALID_COMBOS = [];
-    INPUTS.forEach(i => { OUTPUTS.forEach(o => { [1,2].forEach(n => VALID_COMBOS.push({in:i.code, out:o.code, out_count:n})); }); });
+    // **Feste Kombinationen mit kurzen SKUs (7-stellig)**
+    const COMBINATIONS = [
+      {sku:"PXFX01A",input:"sac3px", output:"sac3fpx", out_count:1, title:"1× PowerTwist TR1 Kombibuchse IN → 1× PowerTwist TR1 female OUT", image:"img/PXFX01A.png", datasheet:"datasheet/PXFX01A.pdf"},
+      {sku:"PXFX02A",input:"sac3px", output:"sac3fpx", out_count:2, title:"1× PowerTwist TR1 Kombibuchse IN → 2× PowerTwist TR1 female OUT", image:"img/PXFX02A.png", datasheet:"datasheet/PXFX02A.pdf"},
+      {sku:"PXFB01A",input:"sac3px", output:"sac3mpb", out_count:1, title:"1× PowerTwist TR1 Kombibuchse IN → 1× PowerTwist female OUT",     image:"img/PXFB01A.png", datasheet:"datasheet/PXFB01A.pdf"},
+      {sku:"PXFB02A",input:"sac3px", output:"sac3mpb", out_count:2, title:"1× PowerTwist TR1 Kombibuchse IN → 2× PowerTwist female OUT",     image:"img/PXFB02A.png", datasheet:"datasheet/PXFB02A.pdf"},
+      {sku:"MXFX01A",input:"sac3mpx",output:"sac3fpx", out_count:1, title:"1× PowerTwist TR1 male IN → 1× PowerTwist TR1 female OUT",        image:"img/MXFX01A.png", datasheet:"datasheet/MXFX01A.pdf"},
+      {sku:"MXFX02A",input:"sac3mpx",output:"sac3fpx", out_count:2, title:"1× PowerTwist TR1 male IN → 2× PowerTwist TR1 female OUT",        image:"img/MXFX02A.png", datasheet:"datasheet/MXFX02A.pdf"},
+      {sku:"MXFB01A",input:"sac3mpx",output:"sac3mpb", out_count:1, title:"1× PowerTwist TR1 male IN → 1× PowerTwist female OUT",            image:"img/MXFB01A.png", datasheet:"datasheet/MXFB01A.pdf"},
+      {sku:"MXFB02A",input:"sac3mpx",output:"sac3mpb", out_count:2, title:"1× PowerTwist TR1 male IN → 2× PowerTwist female OUT",            image:"img/MXFB02A.png", datasheet:"datasheet/MXFB02A.pdf"},
+      {sku:"MAFX01A",input:"sac3mpa",output:"sac3fpx", out_count:1, title:"1× PowerTwist male IN → 1× PowerTwist TR1 female OUT",            image:"img/MAFX01A.png", datasheet:"datasheet/MAFX01A.pdf"},
+      {sku:"MAFX02A",input:"sac3mpa",output:"sac3fpx", out_count:2, title:"1× PowerTwist male IN → 2× PowerTwist TR1 female OUT",            image:"img/MAFX02A.png", datasheet:"datasheet/MAFX02A.pdf"},
+      {sku:"MAFB01A",input:"sac3mpa",output:"sac3mpb", out_count:1, title:"1× PowerTwist male IN → 1× PowerTwist female OUT",                image:"img/MAFB01A.png", datasheet:"datasheet/MAFB01A.pdf"},
+      {sku:"MAFB02A",input:"sac3mpa",output:"sac3mpb", out_count:2, title:"1× PowerTwist male IN → 2× PowerTwist female OUT",                image:"img/MAFB02A.png", datasheet:"datasheet/MAFB02A.pdf"}
+    ];
 
     // ==========================
-    // 2) Helpers
+    // 2) Helpers (null-sicher)
     // ==========================
-    function $(id){ return document.getElementById(id); }
-    function byCode(list, code){ return list.find(x=>x.code===code); }
-    function isValid(inCode, outCode, outCount){ return VALID_COMBOS.some(c=>c.in===inCode && c.out===outCode && c.out_count===Number(outCount)); }
-    function sku(inCode, outCode, outCount){ return `ADP-${inCode.toUpperCase()}1-${outCode.toUpperCase()}${outCount}`; }
-    function desc(inCode, outCode, outCount){ const i = byCode(INPUTS,inCode), o = byCode(OUTPUTS,outCode); return `1 Eingang ${i?.label || inCode} → ${outCount} Ausgang${outCount>1?'e':''} ${o?.label || outCode}`; }
+    const $ = (id)=>document.getElementById(id);
+    const byCode = (list, code)=>list.find(x=>x.code===code);
+    const findCombo = (inCode, outCode, outCount)=>COMBINATIONS.find(c=>c.input===inCode && c.output===outCode && c.out_count===Number(outCount));
+    const isValid = (inCode, outCode, outCount)=>!!findCombo(inCode, outCode, outCount);
+
+    // Sicheres Setzen per ID (tut nichts, wenn Element fehlt)
+    function setImgById(id, primary, secondary, fallbackSvg){
+      const el = $(id);
+      if (!el) return;
+      el.onerror = null;
+      el.src = primary;
+      el.onerror = () => {
+        if (secondary){ el.onerror=null; el.src=secondary; el.onerror=()=>{ el.src=fallbackSvg; }; }
+        else { el.src = fallbackSvg; }
+      };
+    }
+    function setTextById(id, text){
+      const el = $(id); if (el) el.textContent = text;
+    }
+
     function chip(text){ const s=document.createElement('span'); s.className='pill'; s.textContent=text; return s; }
 
-    // Platzhalter-SVG (ohne Options-Elemente)
+    // Platzhalter-SVG
     function svgPlaceholder(inCode, outCode, outCount){
-      const W=640, H=480, R=16, stroke='#e5e7eb', shadow='#f3f4f6', muted='#6b7280';
+      const W=640, H=480, R=16, stroke='#e5e7eb', muted='#6b7280';
       const inPositions=[H/2], outPositions = outCount===1 ? [H/2] : [H/2-70, H/2+70];
       const inLabel = (byCode(INPUTS,inCode)?.label)||inCode, outLabel=(byCode(OUTPUTS,outCode)?.label)||outCode;
       const port = (x,y,label)=>`<g><circle cx='${x}' cy='${y}' r='22' fill='#111827' opacity='.08'/><circle cx='${x}' cy='${y}' r='12' fill='#111827'/><text x='${x}' y='${y+4}' text-anchor='middle' font-size='10' fill='#fff'>${label}</text></g>`;
       return "data:image/svg+xml;utf8,"+
         `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}' viewBox='0 0 ${W} ${H}'>`+
-        `<defs><filter id='s' x='-50%' y='-50%' width='200%' height='200%'><feDropShadow dx='0' dy='4' stdDeviation='8' flood-color='#f3f4f6'/></filter></defs>`+
-        `<rect x='80' y='80' width='480' height='320' rx='${R}' ry='${R}' fill='#fff' stroke='${stroke}' filter='url(#s)'/>`+
+        `<rect x='80' y='80' width='480' height='320' rx='${R}' ry='${R}' fill='#fff' stroke='${stroke}'/>`+
         `<text x='320' y='115' text-anchor='middle' font-size='18' fill='${muted}'>Durchgangsadapter</text>`+
         `<text x='320' y='140' text-anchor='middle' font-size='12' fill='${muted}'>${inLabel} → ${outLabel}</text>`+
         `${inPositions.map(y=>port(120,y,'IN')).join('')}`+
@@ -252,14 +275,10 @@
         `</svg>`;
     }
 
-    function setImg(el, primary, secondary, fallbackSvg){
-      el.onerror = null; el.src = primary;
-      el.onerror = () => { if (secondary){ el.onerror=null; el.src=secondary; el.onerror=()=>{ el.src=fallbackSvg; }; } else { el.src=fallbackSvg; } };
-    }
-
     // Kartenbreite im Output-Picker auf längste Karte angleichen
     function equalizeOutputCardWidths(){
       const cards = Array.from(document.querySelectorAll('#outputPicker .pick-card'));
+      if (!cards.length) return;
       cards.forEach(c=>c.style.width='max-content');
       const max = Math.min(
         Math.max(...cards.map(c=>c.offsetWidth)),
@@ -268,19 +287,68 @@
       cards.forEach(c=>c.style.width = max + 'px');
     }
 
-    // Bild-Duplikat bei 2 Ausgängen in den kleinen Anzeigen (Hero & Result)
+    // Bild-Duplikat bei 2 Ausgängen (Hero optional – wird nur gerendert, falls vorhanden)
     function renderSmallOutImages(imgUrl, fallbackSvg){
       const wrapIds = ['heroOutWrap','resOutWrap'];
       wrapIds.forEach(id=>{
-        const wrap = document.getElementById(id);
+        const wrap = $(id);
         if(!wrap) return;
         wrap.innerHTML = '';
-        const make = ()=>{ const im=document.createElement('img'); im.alt='Ausgang'; setImg(im, imgUrl, null, fallbackSvg); return im; };
+        const make = ()=>{ const im=document.createElement('img'); im.alt='Ausgang'; im.src=imgUrl; im.onerror=()=>{ im.src=fallbackSvg; }; return im; };
         wrap.appendChild(make());
         if(state.outCount===2) wrap.appendChild(make());
         const span = document.createElement('span'); span.className='small'; span.id = (id==='heroOutWrap'?'heroOutTxt':'resOutTxt');
         wrap.appendChild(span);
       });
+    }
+
+    // --- Mini-Galerie für Produktbilder (Hero-Teil ist optional) ---
+    const gallery = { images: [], idx: 0 };
+
+    function setCounters(){
+      const total = gallery.images.length || 1;
+      const cur = (gallery.idx + 1);
+      const txt = `${cur}/${total}`;
+      const heroC = $('heroCounter');
+      const resC  = $('resultCounter');
+      if (heroC) heroC.textContent = txt;
+      if (resC)  resC.textContent  = txt;
+    }
+
+    function renderGallery(){
+      const fb = svgPlaceholder(state.in, state.out, state.outCount);
+      const src = gallery.images[gallery.idx] || HERO_FALLBACK;
+      // Hero-Bild optional:
+      if ($('heroPreview')) setImgById('heroPreview', src, HERO_FALLBACK, fb);
+      setImgById('resultPreview', src, HERO_FALLBACK, fb);
+      setCounters();
+    }
+
+    function nextImage(){
+      if (gallery.images.length <= 1) return;
+      gallery.idx = (gallery.idx + 1) % gallery.images.length;
+      renderGallery();
+    }
+
+    function prevImage(){
+      if (gallery.images.length <= 1) return;
+      gallery.idx = (gallery.idx - 1 + gallery.images.length) % gallery.images.length;
+      renderGallery();
+    }
+
+    async function buildGalleryForCombo(combo){
+      const candidates = [1,2,3].map(n => `img/${combo.sku}_${n}.png`);
+      const confirmed = [];
+      await Promise.all(candidates.map(url => new Promise(resolve=>{
+        const im = new Image();
+        im.onload  = ()=>{ confirmed.push(url); resolve(); };
+        im.onerror = ()=>{ resolve(); };
+        im.src = url + `?v=${Date.now()}`;
+      })));
+      if (confirmed.length === 0) confirmed.push(combo.image);
+      gallery.images = confirmed;
+      gallery.idx = 0;
+      renderGallery();
     }
 
     // ==========================
@@ -308,7 +376,7 @@
           card.classList.add('selected');
           if (group==='in'){ state.in = item.code; } else { state.out = item.code; }
           updateResult();
-          if(group==='out') equalizeOutputCardWidths();
+          if (group==='out') equalizeOutputCardWidths();
         });
         targetEl.appendChild(card);
       });
@@ -319,63 +387,65 @@
     // ==========================
     function updateResult(){
       const valid = isValid(state.in, state.out, state.outCount);
-      document.getElementById('error').style.display = valid ? 'none' : 'block';
+      $('error').style.display = valid ? 'none' : 'block';
 
       const i = byCode(INPUTS,state.in), o = byCode(OUTPUTS,state.out);
-      const skuTxt = sku(state.in, state.out, state.outCount);
-      const descTxt = desc(state.in, state.out, state.outCount);
+      const combo = findCombo(state.in, state.out, state.outCount);
 
-      document.getElementById('sku').textContent  = valid ? skuTxt : 'ADP—';
-      document.getElementById('desc').textContent = valid ? descTxt : 'Bitte gültige Kombination wählen.';
+      setTextById('sku', valid ? combo.sku : '—');
+      setTextById('desc', valid ? combo.title : 'Bitte gültige Kombination wählen.');
 
       // Chips (nur Ein-/Ausgang)
-      const chips = document.getElementById('chips'); chips.innerHTML='';
+      const chips = $('chips'); chips.innerHTML='';
       chips.append(chip(`1× ${i.label} IN`));
       chips.append(chip(`${state.outCount}× ${o.label} OUT`));
 
-      // Gehäuse-/Hero-Vorschau mit dynamischem PNG → hero.png → SVG
-      const fallbackSvg = svgPlaceholder(state.in, state.out, state.outCount);
-      const devicePng = `img/${skuTxt}.png`;
-      setImg(document.getElementById('heroPreview'), devicePng, HERO_FALLBACK, fallbackSvg);
-      setImg(document.getElementById('resultPreview'), devicePng, HERO_FALLBACK, fallbackSvg);
+      // Galerie: <SKU>_1.._3 oder Hauptbild
+      if (valid) {
+        buildGalleryForCombo(combo);
+      } else {
+        gallery.images = [];
+        gallery.idx = 0;
+        renderGallery();
+      }
 
-      // Steckerseitenbilder
-      const inImg = i.img, outImg = o.img;
-      setImg(document.getElementById('heroInImg'), inImg, null, fallbackSvg);
-      renderSmallOutImages(outImg, fallbackSvg);
-      setImg(document.getElementById('resInImg'), inImg, null, fallbackSvg);
+      // Steckerseitenbilder (klein) – Hero-Varianten sind optional
+      const fb = svgPlaceholder(state.in, state.out, state.outCount);
+      setImgById('heroInImg', i.img, null, fb);   // macht nichts, falls nicht vorhanden
+      renderSmallOutImages(o.img, fb);
+      setImgById('resInImg', i.img, null, fb);
 
-      document.getElementById('heroInTxt').textContent = i.label;
-      document.getElementById('heroOutTxt').textContent = o.label;
-      document.getElementById('heroOutCount').textContent = `×${state.outCount}`;
-      document.getElementById('resInTxt').textContent = i.label;
-      document.getElementById('resOutTxt').textContent = o.label;
-      document.getElementById('resOutCount').textContent = `×${state.outCount}`;
+      setTextById('heroInTxt', i.label);
+      setTextById('heroOutTxt', o.label);
+      setTextById('heroOutCount', `×${state.outCount}`);
+      setTextById('resInTxt', i.label);
+      setTextById('resOutTxt', o.label);
+      setTextById('resOutCount', `×${state.outCount}`);
     }
 
     function downloadDatasheet(){
-      const skuTxt = sku(state.in, state.out, state.outCount);
-      const pdfUrl = `datasheet/${skuTxt}.pdf`;
+      const combo = findCombo(state.in, state.out, state.outCount);
+      if (!combo) return;
       const a = document.createElement('a');
-      a.href = pdfUrl; a.download = `${skuTxt}.pdf`;
+      a.href = combo.datasheet; a.download = `${combo.sku}.pdf`;
       document.body.appendChild(a); a.click(); a.remove();
     }
 
     // ==========================
     // 5) Events / Init
     // ==========================
-    document.getElementById('year').textContent = new Date().getFullYear();
+    $('year').textContent = new Date().getFullYear();
 
     // Buttons OutCount
-    document.getElementById('btnOut1').addEventListener('click', (e)=>{ e.preventDefault(); state.outCount=1; updateResult(); document.getElementById('btnOut1').classList.add('primary'); document.getElementById('btnOut2').classList.remove('primary'); });
-    document.getElementById('btnOut2').addEventListener('click', (e)=>{ e.preventDefault(); state.outCount=2; updateResult(); document.getElementById('btnOut2').classList.add('primary'); document.getElementById('btnOut1').classList.remove('primary'); });
+    $('btnOut1').addEventListener('click', (e)=>{ e.preventDefault(); state.outCount=1; updateResult(); $('btnOut1').classList.add('primary'); $('btnOut2').classList.remove('primary'); });
+    $('btnOut2').addEventListener('click', (e)=>{ e.preventDefault(); state.outCount=2; updateResult(); $('btnOut2').classList.add('primary'); $('btnOut1').classList.remove('primary'); });
 
     // Picker initialisieren
-    buildPicker(document.getElementById('inputPicker'), INPUTS, 'in', state.in);
-    buildPicker(document.getElementById('outputPicker'), OUTPUTS, 'out', state.out);
+    buildPicker($('inputPicker'), INPUTS, 'in', state.in);
+    buildPicker($('outputPicker'), OUTPUTS, 'out', state.out);
 
     // Startzustand
-    document.getElementById('btnOut1').classList.add('primary');
+    $('btnOut1').classList.add('primary');
     updateResult();
     equalizeOutputCardWidths();
     window.addEventListener('resize', equalizeOutputCardWidths);
